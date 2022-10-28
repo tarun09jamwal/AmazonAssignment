@@ -25,13 +25,13 @@ public class ProductDetails {
     By productDetails = By.xpath("//span[@id='productTitle']");
     By productInformation = By.xpath("//form[@id='twister']");
     By questionAndAnswers = By.xpath("//a[@id='askATFLink']");
-    By verifyItemAdded = By.xpath("//span[@class='a-size-medium-plus a-color-base sw-atc-text a-text-bold']");
+    By verifyItemAdded = By.xpath("//div[@id='attachDisplayAddBaseAlert']");
     By cartButton = By.xpath("//span[@id='attach-sidesheet-view-cart-button']");
 
 
     public ProductDetails(WebDriver driver) {
         this.driver = driver;
-        wait = new WebDriverWait(driver, Duration.ofSeconds(50));
+        wait = new WebDriverWait(driver, Duration.ofSeconds(15));
     }
 
     public void URL() throws IOException {
@@ -68,21 +68,21 @@ public class ProductDetails {
 
     public void QuestionAndAnswers() {
         driver.findElement(questionAndAnswers).click();
-        List<WebElement> listofItems = driver.findElements(By.xpath("//div[@class='askWidgetQuestions askLiveSearchHide']"));
+        List<WebElement> listofItems = driver.findElements(By.xpath("//div[@class='a-fixed-left-grid a-spacing-base']"));
 
-        for (int i = 1; i <= listofItems.size(); i++) {
-            listofItems.get(i).click();
-            System.out.println(i);
-            System.out.println("pass");
-            driver.navigate().back();
+        for (int i = 0; i < listofItems.size(); i++) {
+            String text = listofItems.get(i).getText();
+            System.out.println(text);
         }
     }
 
-    public void AddToCart() throws InterruptedException {
+    public void AddToCart() {
         driver.findElement(By.xpath(String.format(addToCartButton, ProductBuyEnum.addToCartButton.getResourcesName()))).click();
+        wait.until(ExpectedConditions.visibilityOf((WebElement) cartButton));
         wait.until(ExpectedConditions.visibilityOf((WebElement) verifyItemAdded));
         String actual = driver.findElement(verifyItemAdded).getText();
-        Assert.isTrue(actual.equals("Added to Cart"), "Expected result does not match with actual result");
+        System.out.println(actual);
+        Assert.isTrue(actual.equals(""), "Expected result does not match with actual result");
     }
 
     public void Cart() {
