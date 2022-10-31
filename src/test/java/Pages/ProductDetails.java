@@ -17,17 +17,17 @@ import Enum.ProductBuyEnum;
 public class ProductDetails {
     WebDriver driver;
     WebDriverWait wait;
-    List<WebElement> allElementDisplay;
     String searchBar = "//div[@class='%s']//input[contains(@class,'nav-progressive-attribute')]";
     String addToCartButton = "//input[@name='%s']";
-    By searchButton = By.xpath("//input[@id='nav-search-submit-button']");
+    String productQuantity = "//a[@id='%s']";
+    By quantityDropdown = By.xpath("(//div[@class='a-row sc-action-links']//span[@class='a-button-inner'])[1]");
     By product = By.linkText("OnePlus 10 Pro 5G (Volcanic Black, 8GB RAM, 128GB Storage)");
     By productDetails = By.xpath("//span[@id='productTitle']");
     By productInformation = By.xpath("//form[@id='twister']");
     By questionAndAnswers = By.xpath("//a[@id='askATFLink']");
     By verifyItemAdded = By.xpath("//div[@id='attachDisplayAddBaseAlert']");
     By cartButton = By.xpath("//span[@id='attach-sidesheet-view-cart-button']");
-
+    By verifyProduct = By.xpath("//div[@class='a-row a-spacing-mini sc-subtotal sc-subtotal-buybox sc-java-remote-feature']");
 
     public ProductDetails(WebDriver driver) {
         this.driver = driver;
@@ -47,15 +47,11 @@ public class ProductDetails {
         data.load(reader);
         driver.findElement(By.xpath(String.format(searchBar, ProductBuyEnum.SearchBarInputBox.getResourcesName()))).sendKeys(data.getProperty("productName"));
         driver.findElement(By.xpath(String.format(searchBar, ProductBuyEnum.SearchButton.getResourcesName()))).click();
-        driver.findElement(searchButton).click();
     }
 
     public void Mobile() {
         driver.findElement(product).click();
-        String mainWindow = driver.getWindowHandle();
         ArrayList<String> childTabWindow = new ArrayList<String>(driver.getWindowHandles());
-        System.out.println(mainWindow);
-        System.out.println(childTabWindow);
         driver.switchTo().window(String.valueOf(childTabWindow.get(1)));
         String actual = driver.findElement(productDetails).getText();
         System.out.println("Name for the product is : " + actual);
@@ -68,25 +64,32 @@ public class ProductDetails {
 
     public void QuestionAndAnswers() {
         driver.findElement(questionAndAnswers).click();
-        List<WebElement> listofItems = driver.findElements(By.xpath("//div[@class='a-fixed-left-grid a-spacing-base']"));
-
-        for (int i = 0; i < listofItems.size(); i++) {
-            String text = listofItems.get(i).getText();
-            System.out.println(text);
+        List<WebElement> ele = driver.findElements(By.xpath("//div[@class='a-fixed-left-grid-col a-col-right' and @style='padding-left:1%;float:left;']"));
+        int count = 0;
+        for (WebElement que : ele) {
+            System.out.println(que.getText());
+            count++;
+            if (count == 3) {
+                break;
+            }
         }
     }
 
     public void AddToCart() {
         driver.findElement(By.xpath(String.format(addToCartButton, ProductBuyEnum.addToCartButton.getResourcesName()))).click();
-        wait.until(ExpectedConditions.visibilityOf((WebElement) cartButton));
-        wait.until(ExpectedConditions.visibilityOf((WebElement) verifyItemAdded));
+        wait.until(ExpectedConditions.elementToBeClickable(cartButton));
         String actual = driver.findElement(verifyItemAdded).getText();
-        System.out.println(actual);
-        Assert.isTrue(actual.equals(""), "Expected result does not match with actual result");
+        Assert.isTrue(actual.equals("Added to Cart"), "Expected result does not match with actual result");
     }
 
     public void Cart() {
         driver.findElement(cartButton).click();
+        driver.findElement(quantityDropdown).click();
+        driver.findElement(By.xpath(String.format(productQuantity, ProductBuyEnum.ProductQuantity.getResourcesName()))).click();
     }
 
+    public void Verify() {
+        String ele = driver.findElement(verifyProduct).getText();
+        System.out.println(ele);
+    }
 }

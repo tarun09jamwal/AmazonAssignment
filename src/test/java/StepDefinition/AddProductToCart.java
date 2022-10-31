@@ -40,7 +40,7 @@ public class AddProductToCart extends BaseClass {
     }
 
     @When("Add the item to the cart")
-    public void add_the_item_to_the_cart() throws InterruptedException {
+    public void add_the_item_to_the_cart()  {
         pageFactory.getProductDetails().AddToCart();
 
     }
@@ -53,6 +53,7 @@ public class AddProductToCart extends BaseClass {
 
     @Then("Verify the item quantity inside the cart and list the total amount for the order")
     public void verify_the_item_quantity_inside_the_cart_and_list_the_total_amount_for_the_order() {
+        pageFactory.getProductDetails().Verify();
 
     }
 
